@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class ProductParam
  * @package App\Entity
- * @ORM\Table(name="productParam")
+ * @ORM\Table(name="productParams")
  * @ORM\Entity()
  */
 class ProductParam
@@ -34,6 +34,14 @@ class ProductParam
      * @ORM\Column(name="value", type="string")
      */
     private $value;
+
+    /**
+     * @var Product
+     *
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="params")
+     * @ORM\JoinColumn(name="productId", referencedColumnName="id")
+     */
+    private $product;
 
     /**
      * @return int
@@ -74,12 +82,32 @@ class ProductParam
     /**
      * @param string $value
      *
-     * @return string
+     * @return $this
      */
     public function setValue(string $value)
     {
         $this->value = $value;
 
-        return $this->value;
+        return $this;
+    }
+
+    /**
+     * @return Product
+     */
+    public function getProduct(): Product
+    {
+        return $this->product;
+    }
+
+    /**
+     * @param Product $product
+     *
+     * @return $this
+     */
+    public function setProduct(Product $product)
+    {
+        $this->product = $product;
+
+        return $this;
     }
 }

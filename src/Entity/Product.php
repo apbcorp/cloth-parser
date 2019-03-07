@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Product
  * @package App\Entity
- * @ORM\Table(name="product")
+ * @ORM\Table(name="products")
  * @ORM\Entity()
  */
 class Product
@@ -34,6 +36,21 @@ class Product
      * @ORM\Column(name="link", type="string")
      */
     private $link = '';
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="ProductParam", mappedBy="product", cascade={"persist", "remove"})
+     */
+    private $params;
+
+    /**
+     * Product constructor.
+     */
+    public function __construct()
+    {
+        $this->params = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -79,6 +96,36 @@ class Product
     public function setLink(string $link)
     {
         $this->link = $link;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getParams(): Collection
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param ProductParam $param
+     *
+     * @return $this
+     */
+    public function addParam(ProductParam $param)
+    {
+        /** @var ProductParam $item */
+        foreach ($this->params as $item) {
+            if ($item->getName() === $param->getName()) {
+                $item->setValue($param->getValue());
+
+                return $this;
+            }
+        }
+
+        $param->setProduct($this);
+        $this->params->add($param);
 
         return $this;
     }

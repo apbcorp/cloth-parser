@@ -23,21 +23,23 @@ final class Version20190305111232 extends AbstractMigration
                 `id` INT AUTO_INCREMENT NOT NULL,
                 `project` VARCHAR(255) NOT NULL,
                 `link` VARCHAR(512) NOT NULL,
-                PRIMARY KEY(id))
+                PRIMARY KEY(id),
+                UNIQUE `project_link`(`project`, `link`))
             DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
 
-        $this->addSql('CREATE TABLE `productParam` (
+        $this->addSql('CREATE TABLE `productParams` (
                 `id` INT AUTO_INCREMENT NOT NULL,
                 `productId` INT NOT NULL,
                 `name` VARCHAR(512) NOT NULL,
-                `value` VARCHAR(512) NOT NULL,
-                PRIMARY KEY(id))
+                `value` LONGTEXT NOT NULL,
+                PRIMARY KEY(id),
+                UNIQUE `product_name` (`productId`, `name`))
             DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
     }
 
     public function down(Schema $schema) : void
     {
         $this->addSql('DROP TABLE `products`');
-        $this->addSql('DROP TABLE `params`');
+        $this->addSql('DROP TABLE `productParams`');
     }
 }
