@@ -28,7 +28,7 @@ class ZeanParserCommand extends Command
             'pattern' => '/<h1 class="heading-title" itemprop="name">(.*)<\/h1>/Us',
             'type' => ParamsDictionary::TYPE_STRING
         ],
-        'image' => [
+        ParamsDictionary::PARAM_IMAGE => [
             'pattern' => '/<a class="swiper-slide" style="" href="(.*)" title/Us',
             'type' => ParamsDictionary::TYPE_ARRAY
         ],
@@ -100,7 +100,7 @@ class ZeanParserCommand extends Command
 
         $updateOldProducts = true;
 
-        //$this->parseCatalog();
+        $this->parseCatalog();
         $this->parseProducts($updateOldProducts);
     }
 
@@ -218,7 +218,8 @@ class ZeanParserCommand extends Command
 
             $result[$paramName] = $this->formatParamValue($matches[1], $paramInfo['type']);
         }
-sleep(1);
+        sleep(1);
+
         return $result;
     }
 
