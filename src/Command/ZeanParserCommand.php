@@ -19,7 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ZeanParserCommand extends Command
 {
     private const SHOP = 'Zean';
-    private const CATALOG_LINK = 'https://www.zean.ua/vse-tovary/#/sort=p.sort_order/order=ASC/limit=10/page={page}';
+    //private const CATALOG_LINK = 'https://www.zean.ua/vse-tovary/#/sort=p.sort_order/order=ASC/limit=10/page={page}';
+    private const CATALOG_LINK = 'https://www.zean.ua/index.php?route=module/journal2_super_filter/products&module_id=5&filters=%2Fsort%3Dp.sort_order%2Forder%3DASC%2Flimit%3D10%2Fpage%3D{page}&oc_route=product%2Fcategory&path=243&manufacturer_id=&search=&tag=';
     private const PRODUCT_LINK_PATTERN = '/<h4 class="name"><a href="(https:\/\/www\.zean\.ua\/.*)">/Us';
 
     private const PARAMS = [
@@ -156,7 +157,7 @@ class ZeanParserCommand extends Command
         $this->output->writeln('Parsing product started');
         while ($products) {
             $this->output->writeln(
-                'Parsing products ' . ($offset * self::LIMIT) . '...' . ((($offset + 1) * self::LIMIT) - 1)
+                'Parsing products ' . ($offset) . '...' . ($offset + self::LIMIT - 1)
             );
 
             /** @var Product $product */
@@ -217,7 +218,7 @@ class ZeanParserCommand extends Command
 
             $result[$paramName] = $this->formatParamValue($matches[1], $paramInfo['type']);
         }
-
+sleep(1);
         return $result;
     }
 
@@ -261,6 +262,7 @@ class ZeanParserCommand extends Command
         $repository = $this->entityManager->getRepository(Product::class);
         $qb = $repository->createQueryBuilder('p');
         $qb->leftJoin(ProductParam::class, 'pp', Join::WITH, 'p.id = pp.product')
+            ->orderBy('p.id')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 

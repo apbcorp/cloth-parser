@@ -22,7 +22,7 @@ final class Version20190305111232 extends AbstractMigration
         $this->addSql('CREATE TABLE `products` (
                 `id` INT AUTO_INCREMENT NOT NULL,
                 `project` VARCHAR(255) NOT NULL,
-                `link` VARCHAR(512) NOT NULL,
+                `link` VARCHAR(255) NOT NULL,
                 PRIMARY KEY(id),
                 UNIQUE `project_link`(`project`, `link`))
             DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
@@ -30,7 +30,7 @@ final class Version20190305111232 extends AbstractMigration
         $this->addSql('CREATE TABLE `productParams` (
                 `id` INT AUTO_INCREMENT NOT NULL,
                 `productId` INT NOT NULL,
-                `name` VARCHAR(512) NOT NULL,
+                `name` VARCHAR(255) NOT NULL,
                 `value` LONGTEXT NOT NULL,
                 PRIMARY KEY(id),
                 UNIQUE `product_name` (`productId`, `name`))
