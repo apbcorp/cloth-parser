@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -51,7 +52,8 @@ class ImagesParserCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Parse images');;
+            ->setDescription('Parse images')
+            ->addArgument('project', InputOption::VALUE_REQUIRED);
     }
 
     /**
@@ -63,9 +65,10 @@ class ImagesParserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
+        $project = $input->getArgument('project');
 
         $offest = 0;
-        $images = $this->getImagesData(self::LIMIT, $offest);
+        $images = $this->getImagesData($project, self::LIMIT, $offest);
         $count = 0;
 
         while ($images) {
@@ -89,18 +92,21 @@ class ImagesParserCommand extends Command
     }
 
     /**
+     * @param string $project
      * @param int $limit
      * @param int $offset
      * @return array
      */
-    private function getImagesData(int $limit, int $offset): array
+    private function getImagesData(string $project, int $limit, int $offset): array
     {
         $qb = $this->repository->createQueryBuilder('pp');
         $qb->select('pp.value as images, p.project, p.id')
             ->leftJoin(Product::class, 'p', Join::WITH, 'pp.product = p.id')
             ->where('pp.name = :param')
+            ->andWhere('p.project = :project')
             ->orderBy('pp.id')
             ->setParameter('param', ParamsDictionary::PARAM_IMAGE)
+            ->setParameter('project', $project)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 

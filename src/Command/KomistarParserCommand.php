@@ -90,11 +90,13 @@ class KomistarParserCommand extends Command
         $page = 1;
 
         $url = str_replace('{page}', $page, self::CATALOG_LINK);
-        $html = file_get_contents($url);
+        $html = ParserHelper::request($url);
+        sleep(1);
         $links = $this->getProductLinks($html);
+        $oldFirstLink = '';
 
         $this->output->writeln('Parsing catalog started');
-        while ($links) {
+        while ($links and $oldFirstLink != $links[0]) {
             $this->output->writeln('Parsing page #' . $page);
             foreach ($links as $link) {
                 $product = $this->entityManager->getRepository(Product::class)->findOneBy(
@@ -117,7 +119,9 @@ class KomistarParserCommand extends Command
 
             $page++;
             $url = str_replace('{page}', $page, self::CATALOG_LINK);
-            $html = file_get_contents($url);
+            $html = ParserHelper::request($url);
+            sleep(1);
+            $oldFirstLink = $links[0];
             $links = $this->getProductLinks($html);
         }
 
@@ -130,7 +134,7 @@ class KomistarParserCommand extends Command
     private function parseProducts(bool $updateOldProducts)
     {
         $offset = 0;
-        $products = $this->entityManager->getRepository(Product::class)->getProducts(self::LIMIT, $offset);
+        $products = $this->entityManager->getRepository(Product::class)->getProducts(self::SHOP, self::LIMIT, $offset);
 
         $this->output->writeln('Parsing product started');
         while ($products) {
@@ -140,6 +144,7 @@ class KomistarParserCommand extends Command
 
             /** @var Product $product */
             foreach ($products as $product) {
+                var_dump($product->getId());
                 if (!$updateOldProducts && $product->getParams()->count() > 0) {
                     continue;
                 }
@@ -148,6 +153,13 @@ class KomistarParserCommand extends Command
                 $params = array_merge($params, $this->getAdditionalParams($product->getLink()));
 
                 foreach ($params as $name => $value) {
+                    /** @var ProductParam $productParam */
+                    foreach ($product->getParams() as $productParam) {
+                        if ($productParam->getName() == $name) {
+                            continue;
+                        }
+                    }
+
                     $param = (new ProductParam())
                         ->setName($name)
                         ->setValue($value);
@@ -160,15 +172,20 @@ class KomistarParserCommand extends Command
             $this->entityManager->clear();
 
             $offset += self::LIMIT;
-            $products = $this->entityManager->getRepository(Product::class)->getProducts(self::LIMIT, $offset);
+            $products = $this->entityManager->getRepository(Product::class)->getProducts(self::SHOP, self::LIMIT, $offset);
         }
 
         $this->output->writeln('Parsing product finished');
     }
 
-    private function getAdditionalParams(string $link)
+    /**
+     * @param string $link
+     * @return array
+     */
+    private function getAdditionalParams(string $link): array
     {
-        $html = file_get_contents($link);
+        $html = ParserHelper::request($link);
+        sleep(1);
 
         if (!preg_match('/product_description">(.*)<\/div>/Us', $html, $matches)) {
             return [];
@@ -197,7 +214,7 @@ class KomistarParserCommand extends Command
                 continue;
             }
 
-            if (strpos($part, '-') === false) {
+            if (strpos($part, ' - ') === false) {
                 continue;
             } else {
                 $parts2 = explode(' ', $part);

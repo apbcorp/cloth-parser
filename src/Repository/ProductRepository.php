@@ -13,16 +13,18 @@ use Doctrine\ORM\Query\Expr\Join;
 class ProductRepository extends EntityRepository
 {
     /**
+     * @param string $shop
      * @param int $limit
      * @param int $offset
      *
      * @return array
      */
-    public function getProducts(int $limit, int $offset): array
-    {var_dump($limit, $offset);
+    public function getProducts(string $shop, int $limit, int $offset): array
+    {
         $qb = $this->createQueryBuilder('p');
-        $qb->leftJoin(ProductParam::class, 'pp', Join::WITH, 'p.id = pp.product')
+        $qb->where('p.project = :shop')
             ->orderBy('p.id')
+            ->setParameter('shop', $shop)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 

@@ -153,7 +153,7 @@ class ZeanParserCommand extends Command
     private function parseProducts(bool $updateOldProducts)
     {
         $offset = 0;
-        $products = $this->entityManager->getRepository(Product::class)->getProducts(self::LIMIT, $offset);
+        $products = $this->entityManager->getRepository(Product::class)->getProducts(self::SHOP, self::LIMIT, $offset);
 
         $this->output->writeln('Parsing product started');
         while ($products) {
@@ -182,7 +182,7 @@ class ZeanParserCommand extends Command
             $this->entityManager->clear();
 
             $offset += self::LIMIT;
-            $products = $this->entityManager->getRepository(Product::class)->getProducts(self::LIMIT, $offset);
+            $products = $this->entityManager->getRepository(Product::class)->getProducts(self::SHOP, self::LIMIT, $offset);
         }
 
         $this->output->writeln('Parsing product finished');
