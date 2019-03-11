@@ -13,4 +13,5 @@ class ParamsDictionary
     public const TYPE_ARRAY = 'array';
 
     public const PARAM_IMAGE = 'image';
+    public const PARAM_ADDITIONAL_IMAGE = 'additionalImage';
 }

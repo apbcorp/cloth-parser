@@ -7,55 +7,32 @@ use App\Entity\Product;
 use App\Entity\ProductParam;
 use App\Helper\ParserHelper;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class ZeanParserCommand
+ * Class KomistarParserCommand
  * @package App\Command
  */
-class ZeanParserCommand extends Command
+class KomistarParserCommand extends Command
 {
-    private const SHOP = 'Zean';
-    //private const CATALOG_LINK = 'https://www.zean.ua/vse-tovary/#/sort=p.sort_order/order=ASC/limit=10/page={page}';
-    private const CATALOG_LINK = 'https://www.zean.ua/index.php?route=module/journal2_super_filter/products&module_id=5&filters=%2Fsort%3Dp.sort_order%2Forder%3DASC%2Flimit%3D10%2Fpage%3D{page}&oc_route=product%2Fcategory&path=243&manufacturer_id=&search=&tag=';
-    private const PRODUCT_LINK_PATTERN = '/<h4 class="name"><a href="(https:\/\/www\.zean\.ua\/.*)">/Us';
+    private const SHOP = 'Komistar';
+    private const CATALOG_LINK = 'https://komistar.in.ua/product_list/page_{page}?sort=&per_page=24#catalog_controls_block';
+    private const PRODUCT_LINK_PATTERN = '/"cs-product-gallery__image-link".*href="(.*)"/Us';
 
     private const PARAMS = [
         'title' => [
-            'pattern' => '/<h1 class="heading-title" itemprop="name">(.*)<\/h1>/Us',
+            'pattern' => '/data-qaid="product_name">(.*)<\/span>/Us',
             'type' => ParamsDictionary::TYPE_STRING
         ],
         ParamsDictionary::PARAM_IMAGE => [
-            'pattern' => '/<a class="swiper-slide" style="" href="(.*)" title/Us',
-            'type' => ParamsDictionary::TYPE_ARRAY
+            'pattern' => '/src="([^\?<>]*)\?PIMAGE_ID=/Us',
+            'type' => ParamsDictionary::TYPE_ARRAY,
         ],
-        'description' => [
-            'pattern' => '/<div class="tab-pane tab-content active" id="tab-description">(.*)<\/div>/Us',
-            'type' => ParamsDictionary::TYPE_STRING
-        ],
-        'model' => [
-            'pattern' => '/<span class="p-model" itemprop="model">(.*)<\/span>/Us',
-            'type' => ParamsDictionary::TYPE_STRING
-        ],
-        'priceOld' => [
-            'pattern' => '/<li class="price-old">(.*)грн<\/li>/Us',
+        'price' => [
+            'pattern' => '/"product_price">(.*)<\/span>/Us',
             'type' => ParamsDictionary::TYPE_INT
-        ],
-        'priceNew' => [
-            'pattern' => '/<li class="price-new">(.*)грн<\/li>/Us',
-            'type' => ParamsDictionary::TYPE_INT
-        ],
-        'size' => [
-            'pattern' => '/<div class="checkbox">.*<input type="checkbox".*>(.*)<\/label>/Us',
-            'type' => ParamsDictionary::TYPE_ARRAY
-        ],
-        'color' => [
-            'pattern' => '/<div class="radio">.*<img.*>.*<img.*>(.*)<\/label>/Us',
-            'type' => ParamsDictionary::TYPE_ARRAY
         ]
     ];
 
@@ -72,7 +49,7 @@ class ZeanParserCommand extends Command
     private $entityManager;
 
 
-    public function __construct($name = 'parser:shop:zean', EntityManagerInterface $entityManager)
+    public function __construct($name = 'parser:shop:komistar', EntityManagerInterface $entityManager)
     {
         parent::__construct($name);
 
@@ -85,7 +62,7 @@ class ZeanParserCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Parser for "zean.ua"')
+            ->setDescription('Parser for "komistar.in.ua"')
         ;
     }
 
@@ -101,7 +78,7 @@ class ZeanParserCommand extends Command
 
         $updateOldProducts = true;
 
-        $this->parseCatalog();
+        //$this->parseCatalog();
         $this->parseProducts($updateOldProducts);
     }
 
@@ -168,6 +145,7 @@ class ZeanParserCommand extends Command
                 }
 
                 $params = ParserHelper::getProductParams($product->getLink(), self::PARAMS);
+                $params = array_merge($params, $this->getAdditionalParams($product->getLink()));
 
                 foreach ($params as $name => $value) {
                     $param = (new ProductParam())
@@ -186,6 +164,61 @@ class ZeanParserCommand extends Command
         }
 
         $this->output->writeln('Parsing product finished');
+    }
+
+    private function getAdditionalParams(string $link)
+    {
+        $html = file_get_contents($link);
+
+        if (!preg_match('/product_description">(.*)<\/div>/Us', $html, $matches)) {
+            return [];
+        }
+
+        $code = $matches[1];
+
+        if (preg_match_all('/<img.*>/Us', $html, $matches)) {
+            foreach ($matches as $match) {
+                $code = str_replace($match, '', $code);
+                $code = str_replace('<p></p>', '', $code);
+                $code = str_replace("\r", '', $code);
+                $code = str_replace("\n", '', $code);
+            }
+        }
+
+        $parts = explode('>', $code);
+
+        $params = ['description' => ''];
+        foreach ($parts as $part) {
+            if (!$part) {
+                continue;
+            }
+            $part = strip_tags($part);
+            if (strpos($part, '•') !== false) {
+                continue;
+            }
+
+            if (strpos($part, '-') === false) {
+                continue;
+            } else {
+                $parts2 = explode(' ', $part);
+                $key = mb_strtolower(trim(str_replace('🔹', '', $parts2[0])));
+                if (!$key || $key == 'застёжка' || $key == 'застежка') {
+                    $params['description'] = str_replace('🔹', '', $part);
+
+                    continue;
+                }
+                $parts2 = explode('-', $part);
+                $params[$key] = trim($parts2[1]);
+            }
+        }
+
+        if (strlen($params['description']) < 20) {
+            unset($params['description']);
+        } else {
+            $params['description'] = trim($params['description']);
+        }
+
+        return $params;
     }
 
     /**
