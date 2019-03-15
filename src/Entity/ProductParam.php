@@ -36,9 +36,9 @@ class ProductParam
     private $value;
 
     /**
-     * @var Product
+     * @var OldProduct
      *
-     * @ORM\ManyToOne(targetEntity="Product", inversedBy="params")
+     * @ORM\ManyToOne(targetEntity="OldProduct", inversedBy="params")
      * @ORM\JoinColumn(name="productId", referencedColumnName="id")
      */
     private $product;
@@ -92,19 +92,19 @@ class ProductParam
     }
 
     /**
-     * @return Product
+     * @return OldProduct
      */
-    public function getProduct(): Product
+    public function getProduct(): OldProduct
     {
         return $this->product;
     }
 
     /**
-     * @param Product $product
+     * @param OldProduct $product
      *
      * @return $this
      */
-    public function setProduct(Product $product)
+    public function setProduct(OldProduct $product)
     {
         $this->product = $product;
 

@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Dictionary\ParamsDictionary;
-use App\Entity\Product;
+use App\Entity\OldProduct;
 use App\Entity\ProductParam;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -97,7 +97,7 @@ class ImagesParserCommand extends Command
     {
         $qb = $this->repository->createQueryBuilder('pp');
         $qb->select('pp.value as images, p.project, p.id')
-            ->leftJoin(Product::class, 'p', Join::WITH, 'pp.product = p.id')
+            ->leftJoin(OldProduct::class, 'p', Join::WITH, 'pp.product = p.id')
             ->where('pp.name = :param')
             ->orderBy('pp.id')
             ->setParameter('param', ParamsDictionary::PARAM_IMAGE)

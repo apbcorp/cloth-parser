@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Dictionary\ParamsDictionary;
-use App\Entity\Product;
+use App\Entity\OldProduct;
 use App\Entity\ProductParam;
 use App\Helper\ParserHelper;
 use Doctrine\ORM\EntityManagerInterface;
@@ -97,7 +97,7 @@ class KomistarParserCommand extends Command
         while ($links) {
             $this->output->writeln('Parsing page #' . $page);
             foreach ($links as $link) {
-                $product = $this->entityManager->getRepository(Product::class)->findOneBy(
+                $product = $this->entityManager->getRepository(OldProduct::class)->findOneBy(
                     ['project' => self::SHOP, 'link' => $link]
                 );
 
@@ -105,7 +105,7 @@ class KomistarParserCommand extends Command
                     continue;
                 }
 
-                $product = (new Product())
+                $product = (new OldProduct())
                     ->setProject(self::SHOP)
                     ->setLink($link);
 
@@ -130,7 +130,7 @@ class KomistarParserCommand extends Command
     private function parseProducts(bool $updateOldProducts)
     {
         $offset = 0;
-        $products = $this->entityManager->getRepository(Product::class)->getProducts(self::LIMIT, $offset);
+        $products = $this->entityManager->getRepository(OldProduct::class)->getProducts(self::LIMIT, $offset);
 
         $this->output->writeln('Parsing product started');
         while ($products) {
@@ -138,7 +138,7 @@ class KomistarParserCommand extends Command
                 'Parsing products ' . ($offset) . '...' . ($offset + self::LIMIT - 1)
             );
 
-            /** @var Product $product */
+            /** @var OldProduct $product */
             foreach ($products as $product) {
                 if (!$updateOldProducts && $product->getParams()->count() > 0) {
                     continue;
@@ -160,7 +160,7 @@ class KomistarParserCommand extends Command
             $this->entityManager->clear();
 
             $offset += self::LIMIT;
-            $products = $this->entityManager->getRepository(Product::class)->getProducts(self::LIMIT, $offset);
+            $products = $this->entityManager->getRepository(OldProduct::class)->getProducts(self::LIMIT, $offset);
         }
 
         $this->output->writeln('Parsing product finished');

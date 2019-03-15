@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Product
  * @package App\Entity
- * @ORM\Table(name="products")
- * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
+ * @ORM\Table(name="product")
+ * @ORM\Entity()
  */
 class Product
 {
@@ -24,11 +22,12 @@ class Product
     private $id = 0;
 
     /**
-     * @var string
+     * @var Project|null
      *
-     * @ORM\Column(name="project", type="string")
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="products")
+     * @ORM\JoinColumn(name="projectId", referencedColumnName="id")
      */
-    private $project = '';
+    private $project;
 
     /**
      * @var string
@@ -38,61 +37,34 @@ class Product
     private $link = '';
 
     /**
-     * @var Collection
+     * @var string
      *
-     * @ORM\OneToMany(targetEntity="ProductParam", mappedBy="product", cascade={"persist", "remove"})
+     * @ORM\Column(name="code", type="string")
      */
-    private $params;
+    private $code = '';
 
-    /**
-     * Product constructor.
-     */
-    public function __construct()
-    {
-        $this->params = new ArrayCollection();
-    }
-
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getProject(): string
+    public function getProject(): ?Project
     {
         return $this->project;
     }
 
-    /**
-     * @param string $project
-     *
-     * @return $this
-     */
-    public function setProject(string $project)
+    public function setProject(?Project $project)
     {
         $this->project = $project;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getLink(): string
     {
         return $this->link;
     }
 
-    /**
-     * @param string $link
-     *
-     * @return $this
-     */
     public function setLink(string $link)
     {
         $this->link = $link;
@@ -100,32 +72,14 @@ class Product
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
-    public function getParams(): Collection
+    public function getCode(): string
     {
-        return $this->params;
+        return $this->code;
     }
 
-    /**
-     * @param ProductParam $param
-     *
-     * @return $this
-     */
-    public function addParam(ProductParam $param)
+    public function setCode(string $code)
     {
-        /** @var ProductParam $item */
-        foreach ($this->params as $item) {
-            if ($item->getName() === $param->getName()) {
-                $item->setValue($param->getValue());
-
-                return $this;
-            }
-        }
-
-        $param->setProduct($this);
-        $this->params->add($param);
+        $this->code = $code;
 
         return $this;
     }

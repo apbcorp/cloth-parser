@@ -10,7 +10,7 @@ use Doctrine\ORM\Query\Expr\Join;
  * Class ProductRepository
  * @package App\Repository
  */
-class ProductRepository extends EntityRepository
+class OldProductRepository extends EntityRepository
 {
     /**
      * @param int $limit
