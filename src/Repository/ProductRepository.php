@@ -2,9 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\ProductParam;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Class ProductRepository
@@ -15,19 +14,20 @@ class ProductRepository extends EntityRepository
     /**
      * @param string $shop
      * @param int $limit
-     * @param int $offset
+     * @param int $page
+     * @param int $prevId
      *
-     * @return array
+     * @return QueryBuilder
      */
-    public function getProducts(string $shop, int $limit, int $offset): array
+    public function getProductsQuery(int $limit, int $page, int $prevId = 0): QueryBuilder
     {
         $qb = $this->createQueryBuilder('p');
-        $qb->where('p.project = :shop')
-            ->orderBy('p.id')
-            ->setParameter('shop', $shop)
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
 
-        return $qb->getQuery()->getResult();
+        $qb->where('p.id > :prevId')
+            ->setParameter('prevId', $prevId)
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit);
+
+        return $qb;
     }
 }
