@@ -1,3 +1,19 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+frontend_project_list:
+    path: /
+    controller: App\Controller\FrontEnd\DefaultController::projectAction
+    methods: GET
+
+frontend_product_list:
+    path: /project/{projectId}
+    controller: App\Controller\FrontEnd\DefaultController::productListAction
+    methods: GET
+
+api_project_list:
+    path: /api/project/list
+    controller: App\Controller\Api\ProjectController::listAction
+    methods: GET
+
+api_product_list:
+    path: /api/project/{projectId}/product/list
+    controller: App\Controller\Api\ProductController::listAction
+    methods: GET

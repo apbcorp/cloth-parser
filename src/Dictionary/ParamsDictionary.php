@@ -16,4 +16,9 @@ class ParamsDictionary
     public const PARAM_ADDITIONAL_IMAGE = 'additionalImage';
     public const PARAM_MODEL = 'model';
     public const PARMA_CATEGORIES = 'categories';
+
+    public const PARAM_TEXT = 'text';
+    public const PARAM_PHOTO = 'photo';
+    public const PARAM_LONGTEXT = 'longtext';
+    public const PARAM_TEXT_OR_CHECK = 'textOrCheckbox';
 }
