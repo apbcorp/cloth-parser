@@ -29,3 +29,7 @@ services:
     App\EventSubscribers\AuthenticatedSubscriber:
         tags:
             - { name: kernel.event_listener, event: kernel.controller }
+
+    service.parser.zean:
+        class: App\Services\Parser\ZeanParserService
+        public: true

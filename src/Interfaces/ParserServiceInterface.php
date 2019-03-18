@@ -14,4 +14,18 @@ interface ParserServiceInterface
      * @return array
      */
     public function parseProduct(string $html): array;
+
+    /**
+     * @param int $page
+     *
+     * @return string
+     */
+    public function getCatalogPageUrl(int $page): string;
+
+    /**
+     * @param string $html
+     *
+     * @return array
+     */
+    public function getProductLinks(string $html): array;
 }

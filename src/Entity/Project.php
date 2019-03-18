@@ -69,7 +69,7 @@ class Project
         return $this;
     }
 
-    public function getService(): string
+    public function getServiceName(): string
     {
         return $this->service;
     }

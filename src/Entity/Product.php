@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Product
  * @package App\Entity
  * @ORM\Table(name="product")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  */
 class Product
 {
@@ -24,7 +24,7 @@ class Product
     /**
      * @var Project|null
      *
-     * @ORM\ManyToOne(targetEntity="Product", inversedBy="products")
+     * @ORM\ManyToOne(targetEntity="Project", inversedBy="products")
      * @ORM\JoinColumn(name="projectId", referencedColumnName="id")
      */
     private $project;

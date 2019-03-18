@@ -8,7 +8,7 @@ var productLister = {
     },
     getProductList: function () {
         $.ajax({
-            url: '/api/product/list',
+            url: '/api/project/' + getParam('projectId') + '/product/list',
             success: this.successGetProductList.bind(this)
         })
     },
