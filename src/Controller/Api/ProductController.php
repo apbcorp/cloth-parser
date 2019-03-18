@@ -64,7 +64,8 @@ class ProductController
                 'project' => $this->entityManager->getReference(Project::class, $projectId),
                 'limit' => $request->get('limit', 10),
                 'page' => $request->get('page', 1),
-                'prevId' => $request->get('prevId', 0)
+                'prevId' => $request->get('prevId', 0),
+                'status' => $request->get('status', Product::STATUS_NEW)
             ];
         } catch (ORMException $e) {
             return [];
@@ -75,8 +76,9 @@ class ProductController
             ->getRepository(Product::class)
             ->getProductsQuery($filter['limit'], $filter['page'], $filter['prevId']);
 
-        $query->andWhere('p.project = :project')
-            ->setParameter('project', $filter['project']);
+        $query->andWhere('p.project = :project AND p.status = :status')
+            ->setParameter('project', $filter['project'])
+            ->setParameter('status', $filter['status']);
 
         /** @var Product[] $products */
         $products = $query->getQuery()->getResult();
@@ -91,6 +93,7 @@ class ProductController
 
         foreach ($products as $product) {
             $result[$product->getId()] = [
+                'id' => $product->getId(),
                 'link' => $product->getLink(),
                 'params' => $service->parseProduct($product->getCode())
             ];

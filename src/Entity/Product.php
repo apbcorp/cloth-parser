@@ -12,6 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Product
 {
+    public const STATUS_NEW = 0;
+    public const STATUS_APPROVE = 1;
+    public const STATUS_DECLINE = 2;
+
     /**
      * @var int
      *
@@ -42,6 +46,13 @@ class Product
      * @ORM\Column(name="code", type="string")
      */
     private $code = '';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="status", type="integer")
+     */
+    private $status = self::STATUS_NEW;
 
     public function getId(): int
     {
@@ -80,6 +91,18 @@ class Product
     public function setCode(string $code)
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status)
+    {
+        $this->status = $status;
 
         return $this;
     }

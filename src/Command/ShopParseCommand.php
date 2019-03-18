@@ -141,7 +141,7 @@ class ShopParseCommand extends Command
 
             $this->entityManager->flush();
             $this->entityManager->clear();
-return;
+
             $page++;
             $html = $this->getHtml($this->service->getCatalogPageUrl($page));
             $productLinks = $this->service->getProductLinks($html);
