@@ -87,7 +87,7 @@ class ImagesParserCommand extends Command
 
             $this->entityManager->clear();
             $offest += self::LIMIT;
-            $images = $this->getImagesData(self::LIMIT, $offest);
+            $images = $this->getImagesData($project, self::LIMIT, $offest);
         }
     }
 
@@ -141,7 +141,13 @@ class ImagesParserCommand extends Command
                 continue;
             }
 
-            file_put_contents($path, file_get_contents($image));
+            try {
+                $content = file_get_contents($image);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            file_put_contents($path, $content);
             sleep(1);
         }
 
