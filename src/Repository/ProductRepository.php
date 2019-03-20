@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 class ProductRepository extends EntityRepository
 {
     /**
+     * @param string $shop
      * @param int $limit
      * @param int $page
      * @param int $prevId

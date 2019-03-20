@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -51,7 +52,8 @@ class ImagesParserCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Parse images');;
+            ->setDescription('Parse images')
+            ->addArgument('project', InputOption::VALUE_REQUIRED);
     }
 
     /**
@@ -63,9 +65,10 @@ class ImagesParserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
+        $project = $input->getArgument('project');
 
         $offest = 0;
-        $images = $this->getImagesData(self::LIMIT, $offest);
+        $images = $this->getImagesData($project, self::LIMIT, $offest);
         $count = 0;
 
         while ($images) {
@@ -84,23 +87,26 @@ class ImagesParserCommand extends Command
 
             $this->entityManager->clear();
             $offest += self::LIMIT;
-            $images = $this->getImagesData(self::LIMIT, $offest);
+            $images = $this->getImagesData($project, self::LIMIT, $offest);
         }
     }
 
     /**
+     * @param string $project
      * @param int $limit
      * @param int $offset
      * @return array
      */
-    private function getImagesData(int $limit, int $offset): array
+    private function getImagesData(string $project, int $limit, int $offset): array
     {
         $qb = $this->repository->createQueryBuilder('pp');
         $qb->select('pp.value as images, p.project, p.id')
             ->leftJoin(OldProduct::class, 'p', Join::WITH, 'pp.product = p.id')
             ->where('pp.name = :param')
+            ->andWhere('p.project = :project')
             ->orderBy('pp.id')
             ->setParameter('param', ParamsDictionary::PARAM_IMAGE)
+            ->setParameter('project', $project)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
@@ -135,7 +141,13 @@ class ImagesParserCommand extends Command
                 continue;
             }
 
-            file_put_contents($path, file_get_contents($image));
+            try {
+                $content = file_get_contents($image);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            file_put_contents($path, $content);
             sleep(1);
         }
 

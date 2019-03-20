@@ -90,11 +90,13 @@ class KomistarParserCommand extends Command
         $page = 1;
 
         $url = str_replace('{page}', $page, self::CATALOG_LINK);
-        $html = file_get_contents($url);
+        $html = ParserHelper::request($url);
+        sleep(1);
         $links = $this->getProductLinks($html);
+        $oldFirstLink = '';
 
         $this->output->writeln('Parsing catalog started');
-        while ($links) {
+        while ($links and $oldFirstLink != $links[0]) {
             $this->output->writeln('Parsing page #' . $page);
             foreach ($links as $link) {
                 $product = $this->entityManager->getRepository(OldProduct::class)->findOneBy(
@@ -117,7 +119,9 @@ class KomistarParserCommand extends Command
 
             $page++;
             $url = str_replace('{page}', $page, self::CATALOG_LINK);
-            $html = file_get_contents($url);
+            $html = ParserHelper::request($url);
+            sleep(1);
+            $oldFirstLink = $links[0];
             $links = $this->getProductLinks($html);
         }
 
@@ -140,6 +144,8 @@ class KomistarParserCommand extends Command
 
             /** @var OldProduct $product */
             foreach ($products as $product) {
+                var_dump($product->getId());
+
                 if (!$updateOldProducts && $product->getParams()->count() > 0) {
                     continue;
                 }
@@ -148,6 +154,13 @@ class KomistarParserCommand extends Command
                 $params = array_merge($params, $this->getAdditionalParams($product->getLink()));
 
                 foreach ($params as $name => $value) {
+                    /** @var ProductParam $productParam */
+                    foreach ($product->getParams() as $productParam) {
+                        if ($productParam->getName() == $name) {
+                            continue;
+                        }
+                    }
+
                     $param = (new ProductParam())
                         ->setName($name)
                         ->setValue($value);
@@ -166,59 +179,34 @@ class KomistarParserCommand extends Command
         $this->output->writeln('Parsing product finished');
     }
 
-    private function getAdditionalParams(string $link)
+    /**
+     * @param string $link
+     * @return array
+     */
+    private function getAdditionalParams(string $link): array
     {
-        $html = file_get_contents($link);
+        $html = ParserHelper::request($link);
+        sleep(1);
 
-        if (!preg_match('/product_description">(.*)<\/div>/Us', $html, $matches)) {
+        $parts = explode('product_description', $html);
+        if (count($parts) == 1) {
             return [];
         }
 
-        $code = $matches[1];
+        $parts2 = explode('</div>', $parts[1]);
 
-        if (preg_match_all('/<img.*>/Us', $html, $matches)) {
-            foreach ($matches as $match) {
-                $code = str_replace($match, '', $code);
-                $code = str_replace('<p></p>', '', $code);
-                $code = str_replace("\r", '', $code);
-                $code = str_replace("\n", '', $code);
-            }
+        $parts3 = explode('<img', $parts2[0]);
+        $result = '';
+        foreach ($parts3 as $part) {
+            $parts4 = explode('>', $part);
+            unset($parts4[0]);
+
+            $result .= implode('>', $parts4);
         }
 
-        $parts = explode('>', $code);
-
-        $params = ['description' => ''];
-        foreach ($parts as $part) {
-            if (!$part) {
-                continue;
-            }
-            $part = strip_tags($part);
-            if (strpos($part, '•') !== false) {
-                continue;
-            }
-
-            if (strpos($part, '-') === false) {
-                continue;
-            } else {
-                $parts2 = explode(' ', $part);
-                $key = mb_strtolower(trim(str_replace('🔹', '', $parts2[0])));
-                if (!$key || $key == 'застёжка' || $key == 'застежка') {
-                    $params['description'] = str_replace('🔹', '', $part);
-
-                    continue;
-                }
-                $parts2 = explode('-', $part);
-                $params[$key] = trim($parts2[1]);
-            }
-        }
-
-        if (strlen($params['description']) < 20) {
-            unset($params['description']);
-        } else {
-            $params['description'] = trim($params['description']);
-        }
-
-        return $params;
+        $result = trim(strip_tags($result));
+        var_dump($result);
+        return ['description' => $result];
     }
 
     /**
