@@ -56,12 +56,12 @@ class ZeanParserService implements ParserServiceInterface
             ],
             [
                 'name' => 'Размер',
-                'type' => ParamsDictionary::PARAM_TEXT_OR_CHECK,
+                'type' => ParamsDictionary::CHECK,
                 'value' => $this->getSize($html)
             ],
             [
                 'name' => 'Цвет',
-                'type' => ParamsDictionary::PARAM_TEXT_OR_CHECK,
+                'type' => ParamsDictionary::CHECK,
                 'value' => $this->getColor($html)
             ],
         ];

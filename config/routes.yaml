@@ -17,3 +17,8 @@ api_product_list:
     path: /api/project/{projectId}/product/list
     controller: App\Controller\Api\ProductController::listAction
     methods: GET
+
+api_param_variants_list:
+    path: /api/param_varians/list
+    controller: App\Controller\Api\VariantsController::listAction
+    methods: GET

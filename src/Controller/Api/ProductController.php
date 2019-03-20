@@ -4,12 +4,10 @@ namespace App\Controller\Api;
 
 use App\Entity\Product;
 use App\Entity\Project;
-use App\Interfaces\ParserServiceInterface;
 use App\Services\ParserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 

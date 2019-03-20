@@ -27,6 +27,6 @@ class DefaultController implements AuthenticatedControllerInterface
      */
     public function productListAction(int $projectId): Response
     {
-        return ViewHelper::getResponse(['/js/product.js']);
+        return ViewHelper::getResponse(['/js/paramVariants.js', '/js/product.js']);
     }
 }
