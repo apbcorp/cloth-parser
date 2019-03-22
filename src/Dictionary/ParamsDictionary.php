@@ -12,13 +12,17 @@ class ParamsDictionary
     public const TYPE_STRING = 'string';
     public const TYPE_ARRAY = 'array';
 
-    public const PARAM_IMAGE = 'image';
+    public const PARAM_IMAGE            = 'image';
     public const PARAM_ADDITIONAL_IMAGE = 'additionalImage';
-    public const PARAM_MODEL = 'model';
-    public const PARMA_CATEGORIES = 'categories';
+    public const PARAM_MODEL            = 'model';
+    public const PARAM_CATEGORIES       = 'categories';
 
-    public const PARAM_TEXT     = 'text';
-    public const PARAM_PHOTO    = 'photo';
-    public const PARAM_LONGTEXT = 'longtext';
-    public const CHECK          = 'checkbox';
+    public const PARAM_TYPE_TEXT     = 'text';
+    public const PARAM_TYPE_PHOTO    = 'photo';
+    public const PARAM_TYPE_LONGTEXT = 'longtext';
+    public const PARAM_TYPE_MULTI    = 'multiselect';
+
+    public const PARAM_TYPES_WITH_VARIANTS = [
+        self::PARAM_TYPE_MULTI
+    ];
 }

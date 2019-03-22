@@ -16,6 +16,12 @@ class Product
     public const STATUS_APPROVE = 1;
     public const STATUS_DECLINE = 2;
 
+    public const STATUS_LIST = [
+        self::STATUS_NEW     => self::STATUS_NEW,
+        self::STATUS_APPROVE => self::STATUS_APPROVE,
+        self::STATUS_DECLINE => self::STATUS_DECLINE,
+    ];
+
     /**
      * @var int
      *

@@ -18,6 +18,16 @@ api_product_list:
     controller: App\Controller\Api\ProductController::listAction
     methods: GET
 
+api_product_change_status:
+    path: /api/project/{projectId}/product/{productId}/status_change/{status}
+    controller: App\Controller\Api\ProductController::changeStatusAction
+    methods: POST
+
+api_product_approve:
+    path: /api/project/{projectId}/product/{productId}/approve
+    controller: App\Controller\Api\ProductController::approveAction
+    methods: POST
+
 api_param_variants_list:
     path: /api/param_varians/list
     controller: App\Controller\Api\VariantsController::listAction

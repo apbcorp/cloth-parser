@@ -31,37 +31,37 @@ class ZeanParserService implements ParserServiceInterface
         return [
             [
                 'name' => 'Название',
-                'type' => ParamsDictionary::PARAM_TEXT,
+                'type' => ParamsDictionary::PARAM_TYPE_TEXT,
                 'value' => $this->getTitle($html)
             ],
             [
                 'name' => 'Фото',
-                'type' => ParamsDictionary::PARAM_PHOTO,
+                'type' => ParamsDictionary::PARAM_TYPE_PHOTO,
                 'value' => $this->getPhoto($html)
             ],
             [
                 'name' => 'Описание',
-                'type' => ParamsDictionary::PARAM_LONGTEXT,
+                'type' => ParamsDictionary::PARAM_TYPE_LONGTEXT,
                 'value' => $this->getDescription($html)
             ],
             [
                 'name' => 'Модель',
-                'type' => ParamsDictionary::PARAM_TEXT,
+                'type' => ParamsDictionary::PARAM_TYPE_TEXT,
                 'value' => $this->getModel($html)
             ],
             [
                 'name' => 'Цена',
-                'type' => ParamsDictionary::PARAM_TEXT,
+                'type' => ParamsDictionary::PARAM_TYPE_TEXT,
                 'value' => $this->getPrice($html)
             ],
             [
                 'name' => 'Размер',
-                'type' => ParamsDictionary::CHECK,
+                'type' => ParamsDictionary::PARAM_TYPE_MULTI,
                 'value' => $this->getSize($html)
             ],
             [
                 'name' => 'Цвет',
-                'type' => ParamsDictionary::CHECK,
+                'type' => ParamsDictionary::PARAM_TYPE_MULTI,
                 'value' => $this->getColor($html)
             ],
         ];

@@ -79,7 +79,7 @@
           .addClass('ui-helper-reset')
           .html(function() {
             if(o.header === true) {
-              return '<li><a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' + o.checkAllText + '</span></a></li><li><a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-closethick"></span><span>' + o.uncheckAllText + '</span></a></li>';
+              return '<li><a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-multiselect"></span><span>' + o.checkAllText + '</span></a></li><li><a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-closethick"></span><span>' + o.uncheckAllText + '</span></a></li>';
             } else if(typeof o.header === "string") {
               return '<li>' + o.header + '</li>';
             } else {
@@ -295,7 +295,7 @@
         if($(this).hasClass('ui-multiselect-close')) {
           self.close();
 
-          // check all / uncheck all
+          // multiselect all / uncheck all
         } else {
           self[$(this).hasClass('ui-multiselect-all') ? 'checkAll' : 'uncheckAll']();
         }

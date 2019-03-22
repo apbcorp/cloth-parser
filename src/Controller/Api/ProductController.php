@@ -61,29 +61,31 @@ class ProductController
     }
 
     /**
+     * @param int $projectId
      * @param int $productId
      * @param int $status
      *
      * @return JsonResponse
      */
-    public function changeStatusAction(int $productId, int $status): JsonResponse
+    public function changeStatusAction(int $projectId, int $productId, int $status): JsonResponse
     {
-        $this->processor->updateProduct($productId, ['status' => $status]);
+        //$this->processor->upsertProduct($productId, ['status' => $status]);
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse(['success' => true, 'result' => ['id' => $productId]]);
     }
 
     /**
+     * @param int     $projectId
      * @param int     $productId
      * @param Request $request
      *
      * @return JsonResponse
      */
-    public function approveAction(int $productId, Request $request): JsonResponse
+    public function approveAction(int $projectId, int $productId, Request $request): JsonResponse
     {
-        $this->processor->updateProduct($productId, $request->request->all());
+        //$this->processor->upsertProduct($productId, $request->request->all());
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse(['success' => true, 'result' => ['id' => $productId]]);
     }
 
     /**

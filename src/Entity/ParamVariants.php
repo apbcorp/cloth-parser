@@ -68,4 +68,11 @@ class ParamVariants
     {
         return explode('|', $this->variants);
     }
+
+    public function setVariantsAsArray(array $values)
+    {
+        $this->variants = implode('|', $values);
+
+        return $this;
+    }
 }

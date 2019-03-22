@@ -173,7 +173,7 @@ class BuildExportFileCommand extends Command
             $params['meta-description'] = strip_tags($params['description']);
             $params['title-translit'] = TranslitHelper::translit($params['title']);
             if (isset($params[ParamsDictionary::PARAM_IMAGE])) {
-                $params[ParamsDictionary::PARAM_IMAGE] = $this->getImage($params[ParamsDictionary::PARAM_IMAGE], $params[ParamsDictionary::PARMA_CATEGORIES]);
+                $params[ParamsDictionary::PARAM_IMAGE] = $this->getImage($params[ParamsDictionary::PARAM_IMAGE], $params[ParamsDictionary::PARAM_CATEGORIES]);
             }
 
             $template = $data['row'];
@@ -204,7 +204,7 @@ class BuildExportFileCommand extends Command
                     $images = $param->getValue();
                 }
 
-                if ($param->getName() == ParamsDictionary::PARMA_CATEGORIES) {
+                if ($param->getName() == ParamsDictionary::PARAM_CATEGORIES) {
                     $categories = $param->getValue();
                 }
             }

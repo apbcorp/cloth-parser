@@ -8,15 +8,30 @@ var productEditor = {
         1: 'Подтвержденный',
         2: 'Отклоненный'
     },
+    approveProductStatus: 1,
+    statusButtons: {
+        0: {1: 'Подтвердить', 2: 'Отклонить'},
+        1: {2: 'Отклонить'},
+        2: {1: 'Подтвердить'},
+    },
     paramTypes: {
         text: 'text',
         photo: 'photo',
         longtext: 'longtext',
-        check: 'checkbox'
+        multiselect: 'multiselect'
+    },
+    arrayParamTypes: [],
+    classes: {
+        imageRemoveButton: 'js_imgRemove',
+        photo: 'js_img',
+        changeStatus: 'js_changeStatus'
     },
     status: 0,
     maxColumns: 2,
     init: function () {
+        this.arrayParamTypes.push(this.paramTypes.multiselect);
+        this.arrayParamTypes.push(this.paramTypes.photo);
+
         this.getProductList();
     },
     getProductList: function () {
@@ -79,15 +94,31 @@ var productEditor = {
             noneSelectedText: 'Выберите из списка',
             selectedText: '# выбрано',
         });
+
+        this.bindActions();
+    },
+    bindActions: function () {
+        var deleteImageButtons = $('.' + this.classes.imageRemoveButton);
+        var changeStatusButtons = $('.' + this.classes.changeStatus);
+        deleteImageButtons.off();
+        changeStatusButtons.off();
+
+        deleteImageButtons.on('click', this.removeImageAction.bind(this));
+        changeStatusButtons.on('click', this.changeStatusAction.bind(this));
     },
     generateProductElement: function (product) {
         var productTable = document.createElement('table');
+        productTable.setAttribute('data-product-id', product.id);
         productTable.style.width = '100%';
         productTable.setAttribute('border', 1);
         productTable.setAttribute('rules', 'cols');
         var productRow = document.createElement('tr');
+
         var productCell = document.createElement('td');
-        productCell.setAttribute('colspan', 2);
+        this.appendChangeStatusButtons(productCell, product.id);
+        productRow.appendChild(productCell);
+
+        productCell = document.createElement('td');
         productCell.style.textAlign = 'right';
         var link = document.createElement('a');
         link.setAttribute('href', product.link);
@@ -100,15 +131,17 @@ var productEditor = {
 
         var column = 1;
         var photo = [];
+        var photoParamName = undefined;
         for (var key in product.params) {
             if (product.params[key].type === this.paramTypes.photo) {
                 photo = product.params[key].value;
+                photoParamName = product.params[key].name;
 
                 continue;
             }
 
             productCell = document.createElement('td');
-            productCell.appendChild(this.generateParameter(product.params[key]));
+            productCell.appendChild(this.generateParameter(product.params[key], product.id));
 
             productRow.appendChild(productCell);
             column++;
@@ -127,7 +160,7 @@ var productEditor = {
         productRow = document.createElement('tr');
         productCell = document.createElement('td');
         productCell.setAttribute('colspan', this.maxColumns);
-        productCell.appendChild(this.generatePhotoCell(photo));
+        productCell.appendChild(this.generatePhotoCell(product.id, photo, photoParamName));
         productRow.appendChild(productCell);
         productTable.appendChild(productRow);
         
@@ -135,7 +168,7 @@ var productEditor = {
 
         return productTable;
     },
-    generateParameter: function (param) {
+    generateParameter: function (param, productId) {
         var result = document.createElement('div');
         result.style.display = 'grid';
 
@@ -148,6 +181,9 @@ var productEditor = {
             case this.paramTypes.text:
                 var input = document.createElement('input');
                 input.setAttribute('value', param.value);
+                input.setAttribute('data-name', param.name);
+                input.setAttribute('data-type', param.type);
+                input.setAttribute('data-product-id', productId);
                 input.style.width = '400px';
 
                 result.appendChild(input);
@@ -156,15 +192,21 @@ var productEditor = {
             case this.paramTypes.longtext:
                 var input = document.createElement('textarea');
                 input.setAttribute('rows', 5);
+                input.setAttribute('data-name', param.name);
+                input.setAttribute('data-type', param.type);
+                input.setAttribute('data-product-id', productId);
                 input.style.width = '400px';
                 input.innerText = param.value;
 
                 result.appendChild(input);
 
                 break;
-            case this.paramTypes.check:
+            case this.paramTypes.multiselect:
                 var input = document.createElement('select');
                 input.setAttribute('multiple', 'multiple');
+                input.setAttribute('data-name', param.name);
+                input.setAttribute('data-type', param.type);
+                input.setAttribute('data-product-id', productId);
                 input.classList.add('multiselect');
                 input.style.width = '400px';
 
@@ -195,18 +237,27 @@ var productEditor = {
 
         return result;
     },
-    generatePhotoCell: function (photos) {
+    generatePhotoCell: function (productId, photos, name) {
         var container = document.createElement('table');
+        var $this = this;
 
-        photos.forEach(function (photo) {
+        photos.forEach(function (photo, index) {
             var img = document.createElement('img');
             img.setAttribute('src', photo);
             img.style.maxWidth = '160px';
             img.style.maxHeight = '208px';
+            img.classList.add($this.classes.photo);
+            img.setAttribute('data-product-id', productId);
+            img.setAttribute('data-index', index);
+            img.setAttribute('data-name', name);
+            img.setAttribute('data-type', $this.paramTypes.photo);
 
             container.appendChild(img);
 
             var removeButton = document.createElement('button');
+            removeButton.setAttribute('data-product-id', productId);
+            removeButton.setAttribute('data-index', index);
+            removeButton.classList.add($this.classes.imageRemoveButton);
             var removeImage = document.createElement('img');
             removeImage.setAttribute('src', '/images/trash.png');
             removeImage.style.width = '32px';
@@ -217,5 +268,99 @@ var productEditor = {
         });
 
         return container;
+    },
+    appendChangeStatusButtons: function (cell, productId) {
+        var buttons = this.statusButtons[this.status];
+
+        for (var buttonStatus in buttons) {
+            var button = document.createElement('button');
+            button.innerText = buttons[buttonStatus];
+            button.setAttribute('data-product-id', productId);
+            button.setAttribute('data-target-status', buttonStatus);
+            button.classList.add(this.classes.changeStatus);
+
+            cell.appendChild(button);
+            cell.innerHTML += '&nbsp;&nbsp;&nbsp;';
+        }
+    },
+    removeImageAction: function (event) {
+        var targetDataset = event.currentTarget.dataset;
+        var selector = '.' + this.classes.photo + '[data-product-id="' + targetDataset.productId + '"]';
+        selector += '[data-index="' + targetDataset.index + '"]';
+        var imageElement = $(selector);
+
+        imageElement.remove();
+        event.currentTarget.remove();
+    },
+    changeStatusAction: function (event) {
+        var dataset = event.currentTarget.dataset;
+        if (parseInt(dataset.targetStatus) === this.approveProductStatus) {
+            this.approveAction(event);
+
+            return;
+        }
+
+        var url = '/api/project/' + getParam('projectId') + '/product/' + dataset.productId;
+        url += '/status_change/' + dataset.targetStatus;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            success: this.successChangeStatus.bind(this)
+        });
+    },
+    approveAction: function (event) {
+        var dataset = event.currentTarget.dataset;
+        var fields = $('[data-product-id="' + dataset.productId + '"][data-name]');
+        var $this = this;
+
+        var formData = {};
+        fields.toArray().forEach(function (field) {
+            var value = undefined;
+            var key = undefined;
+
+            if (field.options === undefined) {
+                value = field.value === undefined ? field.src : field.value;
+            } else {
+                value = [];
+                for (key in field.options) {
+                    if (field.options[key].selected === true) {
+                        value.push(field.options[key].value);
+                    }
+                }
+            }
+
+            if (formData[field.dataset.name] === undefined) {
+                formData[field.dataset.name] = {
+                    type: field.dataset.type,
+                    value: $this.arrayParamTypes.indexOf(field.dataset.type) >= 0 && !Array.isArray(value)
+                        ? [value]
+                        : value
+                }
+            } else {
+                if ($this.arrayParamTypes.indexOf(field.dataset.type) >= 0) {
+                    if (Array.isArray(value)) {
+                        formData[field.dataset.name].value = value;
+                    } else {
+                        formData[field.dataset.name].value.push(value);
+                    }
+                } else {
+                    formData[field.dataset.name].value = value;
+                }
+            }
+        });
+
+        var url = '/api/project/' + getParam('projectId') + '/product/' + dataset.productId + '/approve';
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: formData,
+            success: this.successChangeStatus.bind(this)
+        });
+    },
+    successChangeStatus: function (data) {
+        var table = $('table[data-product-id="' + data.result.id + '"]');
+        table[0].style.backgroundColor = 'black';
     }
 };

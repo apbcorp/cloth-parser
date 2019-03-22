@@ -966,7 +966,7 @@ $.widget("ui.mouse", {
 	},
 
 	_mouseMove: function(event) {
-		// IE mouseup check - mouseup happened when mouse was out of window
+		// IE mouseup multiselect - mouseup happened when mouse was out of window
 		if ($.ui.ie && !(document.documentMode >= 9) && !event.button) {
 			return this._mouseUp(event);
 		}
@@ -1940,7 +1940,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 		 * Constrain the position to a mix of grid, containment.
 		 */
 
-		if(this.originalPosition) { //If we are not dragging yet, we won't check for options
+		if(this.originalPosition) { //If we are not dragging yet, we won't multiselect for options
 			var containment;
 			if(this.containment) {
 			if (this.relative_container){
@@ -4533,7 +4533,7 @@ $.widget( "ui.button", {
 
 		this.element
 			.bind( "focus" + this.eventNamespace, function() {
-				// no need to check disabled, focus won't be triggered anyway
+				// no need to multiselect disabled, focus won't be triggered anyway
 				that.buttonElement.addClass( focusClass );
 			})
 			.bind( "blur" + this.eventNamespace, function() {
@@ -4976,7 +4976,7 @@ $.extend(Datepicker.prototype, {
 	   @param  target    element - the target input field or division or span
 	   @param  settings  object - the new settings to use for this date picker instance (anonymous) */
 	_attachDatepicker: function(target, settings) {
-		// check for settings on the control itself - in namespace 'date:'
+		// multiselect for settings on the control itself - in namespace 'date:'
 		var inlineSettings = null;
 		for (var attrName in this._defaults) {
 			var attrValue = target.getAttribute('date:' + attrName);
@@ -5603,7 +5603,7 @@ $.extend(Datepicker.prototype, {
 		offset.left -= (isFixed && offset.left == inst.input.offset().left) ? $(document).scrollLeft() : 0;
 		offset.top -= (isFixed && offset.top == (inst.input.offset().top + inputHeight)) ? $(document).scrollTop() : 0;
 
-		// now check if datepicker is showing outside window viewport - move to a better place if so.
+		// now multiselect if datepicker is showing outside window viewport - move to a better place if so.
 		offset.left -= Math.min(offset.left, (offset.left + dpWidth > viewWidth && viewWidth > dpWidth) ?
 			Math.abs(offset.left + dpWidth - viewWidth) : 0);
 		offset.top -= Math.min(offset.top, (offset.top + dpHeight > viewHeight && viewHeight > dpHeight) ?
@@ -6206,7 +6206,7 @@ $.extend(Datepicker.prototype, {
 	   Hours may be non-zero on daylight saving cut-over:
 	   > 12 when midnight changeover, but then cannot generate
 	   midnight datetime, so jump to 1AM, otherwise reset.
-	   @param  date  (Date) the date to check
+	   @param  date  (Date) the date to multiselect
 	   @return  (Date) the corrected date */
 	_daylightSavingAdjust: function(date) {
 		if (!date) return null;
@@ -8958,7 +8958,7 @@ $.widget( "ui.spinner", {
 					this.element.focus();
 					this.previous = previous;
 					// support: IE
-					// IE sets focus asynchronously, so we need to check if focus
+					// IE sets focus asynchronously, so we need to multiselect if focus
 					// moved off of the input because the user clicked on the button.
 					this._delay(function() {
 						this.previous = previous;
@@ -8973,7 +8973,7 @@ $.widget( "ui.spinner", {
 			// support: IE
 			// IE doesn't prevent moving focus even with event.preventDefault()
 			// so we set a flag to know when we should ignore the blur event
-			// and check (again) if focus moved off of the input.
+			// and multiselect (again) if focus moved off of the input.
 			this.cancelBlur = true;
 			this._delay(function() {
 				delete this.cancelBlur;
@@ -9363,7 +9363,7 @@ $.widget( "ui.tabs", {
 		this._processTabs();
 
 		if ( active === null ) {
-			// check the fragment identifier in the URL
+			// multiselect the fragment identifier in the URL
 			if ( locationHash ) {
 				this.tabs.each(function( i, tab ) {
 					if ( $( tab ).attr( "aria-controls" ) === locationHash ) {
@@ -9373,7 +9373,7 @@ $.widget( "ui.tabs", {
 				});
 			}
 
-			// check for a tab marked active via a class
+			// multiselect for a tab marked active via a class
 			if ( active === null ) {
 				active = this.tabs.index( this.tabs.filter( ".ui-tabs-active" ) );
 			}
@@ -9408,7 +9408,7 @@ $.widget( "ui.tabs", {
 			) ).sort();
 		}
 
-		// check for length avoids error when initializing empty list
+		// multiselect for length avoids error when initializing empty list
 		if ( this.options.active !== false && this.anchors.length ) {
 			this.active = this._findActive( this.options.active );
 		} else {
@@ -10360,7 +10360,7 @@ if ( $.uiBackCompat !== false ) {
 
 			// If selected tab was removed focus tab to the right or
 			// in case the last tab was removed the tab to the left.
-			// We check for more than 2 tabs, because if there are only 2,
+			// We multiselect for more than 2 tabs, because if there are only 2,
 			// then when we remove this tab, there will only be one tab left
 			// so we don't need to detect which tab to activate.
 			if ( tab.hasClass( "ui-tabs-active" ) && this.anchors.length > 2 ) {
@@ -10857,7 +10857,7 @@ $.widget( "ui.tooltip", {
 		}
 
 		// if we have a title, clear it to prevent the native tooltip
-		// we have to check first to avoid defining a title if none exists
+		// we have to multiselect first to avoid defining a title if none exists
 		// (we don't want to cause an element to start matching [title])
 		//
 		// We use removeAttr only for key events, to allow IE to export the correct
