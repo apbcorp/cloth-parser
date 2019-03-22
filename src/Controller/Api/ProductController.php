@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\Product;
 use App\Entity\Project;
 use App\Services\ParserManager;
+use App\Services\Processor\ProductProcessor;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
@@ -28,15 +29,25 @@ class ProductController
     private $manager;
 
     /**
+     * @var ProductProcessor
+     */
+    private $processor;
+
+    /**
      * ProductController constructor.
      *
      * @param EntityManagerInterface $entityManager
      * @param ParserManager          $manager
+     * @param ProductProcessor       $processor
      */
-    public function __construct(EntityManagerInterface $entityManager, ParserManager $manager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ParserManager $manager,
+        ProductProcessor $processor
+    ) {
         $this->entityManager = $entityManager;
         $this->manager = $manager;
+        $this->processor = $processor;
     }
 
     /**
@@ -47,6 +58,32 @@ class ProductController
         $productsData = $this->getProducts($projectId, $request);
 
         return new JsonResponse(['success' => true, 'result' => $productsData]);
+    }
+
+    /**
+     * @param int $productId
+     * @param int $status
+     *
+     * @return JsonResponse
+     */
+    public function changeStatusAction(int $productId, int $status): JsonResponse
+    {
+        $this->processor->updateProduct($productId, ['status' => $status]);
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    /**
+     * @param int     $productId
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function approveAction(int $productId, Request $request): JsonResponse
+    {
+        $this->processor->updateProduct($productId, $request->request->all());
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
