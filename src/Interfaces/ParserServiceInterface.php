@@ -28,4 +28,11 @@ interface ParserServiceInterface
      * @return array
      */
     public function getProductLinks(string $html): array;
+
+    /**
+     * @param int $productId
+     *
+     * @return array
+     */
+    public function getProduct(int $productId): array;
 }

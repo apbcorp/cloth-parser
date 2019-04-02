@@ -11,7 +11,7 @@ var productEditor = {
     approveProductStatus: 1,
     statusButtons: {
         0: {1: 'Подтвердить', 2: 'Отклонить'},
-        1: {2: 'Отклонить'},
+        1: {1: 'Сохранить', 2: 'Отклонить'},
         2: {1: 'Подтвердить'},
     },
     paramTypes: {
@@ -24,9 +24,15 @@ var productEditor = {
     classes: {
         imageRemoveButton: 'js_imgRemove',
         photo: 'js_img',
-        changeStatus: 'js_changeStatus'
+        changeStatus: 'js_changeStatus',
+        selectStatus: 'js_selectStatus',
+        nextPage: 'js_nextPage',
+        prevPage: 'js_prevPage',
     },
     status: 0,
+    prevId: 0,
+    maxCurrentId: 0,
+    prevPageProductId: 0,
     maxColumns: 2,
     init: function () {
         this.arrayParamTypes.push(this.paramTypes.multiselect);
@@ -36,7 +42,8 @@ var productEditor = {
     },
     getProductList: function () {
         var data = {
-            status: this.status
+            status: this.status,
+            prevId: this.prevId
         };
 
         $.ajax({
@@ -46,11 +53,46 @@ var productEditor = {
         })
     },
     successGetProductList: function(data) {
-        this.onShow(data.result);
+        this.onShow(data.result, data.firstId, data.lastId, data.prevPageProductId);
     },
-    onShow: function (data) {
+    onShow: function (data, firstId, lastId, prevPageProductId) {
+        if ($('body table').length) {
+            $('body table')[0].remove();
+
+            var buttons = $('body button');
+            buttons.toArray().forEach(function (button) {
+                button.remove();
+            });
+        }
+
+        if (data) {
+            this.prevPageProductId = prevPageProductId;
+            var prevButton = document.createElement('button');
+            prevButton.innerText = '<<<';
+            prevButton.classList.add(this.classes.prevPage);
+            prevButton.style.position = 'fixed';
+            prevButton.style.top = Math.round((window.innerHeight - 22) / 2) + 'px';
+            prevButton.style.left = '0px';
+
+            $('body')[0].appendChild(prevButton);
+
+            this.maxCurrentId = data[getLastKey(data)].id;
+            if (this.maxCurrentId < lastId) {
+                var nextButton = document.createElement('button');
+                nextButton.innerText = '>>>';
+                nextButton.classList.add(this.classes.nextPage);
+                nextButton.style.position = 'fixed';
+                nextButton.style.top = Math.round((window.innerHeight - 22) / 2)  + 'px';
+                nextButton.style.left = Math.round(window.innerWidth - 60)  + 'px';
+
+                $('body')[0].appendChild(nextButton);
+            }
+        }
+
         var table = document.createElement('table');
-        table.style.width = '100%';
+        table.style.width = '95%';
+        table.style.marginLeft = '45px';
+        table.style.marginRight = '45px';
         var row = document.createElement('tr');
         var cell = document.createElement('td');
 
@@ -59,11 +101,16 @@ var productEditor = {
         var filterCell = document.createElement('td');
         var filterSelector = document.createElement('select');
         var option = undefined;
+        filterSelector.classList.add(this.classes.selectStatus);
 
         for (var key in this.productStatuses) {
             option = document.createElement('option');
             option.innerText = this.productStatuses[key];
             option.setAttribute('value', key);
+
+            if (parseInt(key) === this.status) {
+                option.setAttribute('selected', 'selected');
+            }
 
             filterSelector.appendChild(option);
         }
@@ -100,11 +147,17 @@ var productEditor = {
     bindActions: function () {
         var deleteImageButtons = $('.' + this.classes.imageRemoveButton);
         var changeStatusButtons = $('.' + this.classes.changeStatus);
+        var selectStatusSelector = $('.' + this.classes.selectStatus);
+        var nextPageButton = $('.' + this.classes.nextPage);
+        var prevPageButton = $('.' + this.classes.prevPage);
         deleteImageButtons.off();
         changeStatusButtons.off();
 
         deleteImageButtons.on('click', this.removeImageAction.bind(this));
         changeStatusButtons.on('click', this.changeStatusAction.bind(this));
+        selectStatusSelector.on('click', this.selectStatusAction.bind(this));
+        nextPageButton.on('click', this.nextPageAction.bind(this));
+        prevPageButton.on('click', this.prevPageAction.bind(this));
     },
     generateProductElement: function (product) {
         var productTable = document.createElement('table');
@@ -308,6 +361,21 @@ var productEditor = {
             method: 'POST',
             success: this.successChangeStatus.bind(this)
         });
+    },
+    selectStatusAction: function (event) {
+        this.status = parseInt(event.target.value);
+
+        this.getProductList();
+    },
+    nextPageAction: function () {
+        this.prevId = this.maxCurrentId;
+
+        this.getProductList();
+    },
+    prevPageAction: function () {
+        this.prevId = this.prevPageProductId;
+
+        this.getProductList();
     },
     approveAction: function (event) {
         var dataset = event.currentTarget.dataset;

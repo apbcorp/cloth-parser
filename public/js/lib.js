@@ -15,3 +15,13 @@ function getParam(paramName) {
 
     return result;
 }
+
+function getLastKey(data) {
+    var result = undefined;
+
+    for (var key in data) {
+        result = key;
+    }
+
+    return result;
+}

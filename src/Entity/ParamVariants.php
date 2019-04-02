@@ -66,6 +66,10 @@ class ParamVariants
 
     public function getVariantsAsArray(): array
     {
+        if (!$this->variants) {
+            return [];
+        }
+
         return explode('|', $this->variants);
     }
 
