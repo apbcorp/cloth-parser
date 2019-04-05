@@ -105,7 +105,7 @@ class ZeanParserService implements ParserServiceInterface
      *
      * @return string
      */
-    public function getCatalogPageUrl(int $page): string
+    public function getCatalogPageUrl($page): string
     {
         return str_replace('{page}', $page, $this->catalogLink);
     }

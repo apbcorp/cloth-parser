@@ -33,3 +33,7 @@ services:
     service.parser.zean:
         class: App\Services\Parser\ZeanParserService
         public: true
+
+    service.parser.instagram.marsego:
+        class: App\Services\Parser\Instagram\MarsegoParserService
+        public: true

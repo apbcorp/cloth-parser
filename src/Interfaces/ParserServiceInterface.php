@@ -20,7 +20,7 @@ interface ParserServiceInterface
      *
      * @return string
      */
-    public function getCatalogPageUrl(int $page): string;
+    public function getCatalogPageUrl($page): string;
 
     /**
      * @param string $html
