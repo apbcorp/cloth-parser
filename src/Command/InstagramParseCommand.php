@@ -170,7 +170,7 @@ class InstagramParseCommand extends Command
     private function parseProducts()
     {
         $params = [
-            'project' => $this->project,
+            'projectId' => $this->project->getId(),
         ];
 
         if ($this->updateMode) {
