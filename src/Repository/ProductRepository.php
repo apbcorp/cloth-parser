@@ -167,9 +167,9 @@ class ProductRepository extends EntityRepository
         $qb = $this->createQueryBuilder('p');
 
         $qb->where('p.id > :prevId')
-            ->andWhere('p.project = :project AND p.status = :status')
+            ->andWhere('p.projectId = :project AND p.status = :status')
             ->setParameter('prevId', $filter['prevId'])
-            ->setParameter('projectId', $filter['project'])
+            ->setParameter('project', $filter['project'])
             ->setParameter('status', $filter['status'])
             ->setMaxResults($filter['limit'])
             ->setFirstResult(($filter['page'] - 1) * $filter['limit']);
