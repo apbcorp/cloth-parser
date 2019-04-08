@@ -32,12 +32,11 @@ class Product
     private $id = 0;
 
     /**
-     * @var Project|null
+     * @var int|null
      *
-     * @ORM\ManyToOne(targetEntity="Project", inversedBy="products")
-     * @ORM\JoinColumn(name="projectId", referencedColumnName="id")
+     * @ORM\Column(name="projectId", type="integer")
      */
-    private $project;
+    private $projectId;
 
     /**
      * @var string
@@ -65,14 +64,14 @@ class Product
         return $this->id;
     }
 
-    public function getProject(): ?Project
+    public function getProjectId(): ?int
     {
-        return $this->project;
+        return $this->projectId;
     }
 
-    public function setProject(?Project $project)
+    public function setProjectId(?int $projectId)
     {
-        $this->project = $project;
+        $this->projectId = $projectId;
 
         return $this;
     }

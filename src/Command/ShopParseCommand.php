@@ -133,7 +133,7 @@ class ShopParseCommand extends Command
                 }
 
                 $entity = (new Product())
-                    ->setProject($this->project)
+                    ->setProjectId($this->project->getId())
                     ->setLink($link);
 
                 $this->entityManager->persist($entity);

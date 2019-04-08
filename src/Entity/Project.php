@@ -89,7 +89,7 @@ class Project
     public function addProduct(Product $product)
     {
         if (!$this->products->contains($product)) {
-            $product->setProject($this);
+            $product->setProjectId($this);
             $this->products->add($product);
         }
 
