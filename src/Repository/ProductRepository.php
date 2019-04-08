@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ProductRepository extends EntityRepository
 {
-    private const DEFAULT_LIMIT = 3;
+    private const DEFAULT_LIMIT = 20;
 
     /**
      * @param int           $projectId

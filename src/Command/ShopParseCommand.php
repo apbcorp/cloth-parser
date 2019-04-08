@@ -137,9 +137,9 @@ class ShopParseCommand extends Command
                     ->setLink($link);
 
                 $this->entityManager->persist($entity);
+                $this->entityManager->flush();
             }
 
-            $this->entityManager->flush();
             $this->entityManager->clear();
 
             $page++;

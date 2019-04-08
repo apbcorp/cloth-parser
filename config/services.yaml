@@ -34,6 +34,10 @@ services:
         class: App\Services\Parser\ZeanParserService
         public: true
 
+    service.parser.artj:
+        class: App\Services\Parser\ArtjParserService
+        public: true
+
     service.parser.instagram.marsego:
         class: App\Services\Parser\Instagram\MarsegoParserService
         public: true
